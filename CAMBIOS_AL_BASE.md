@@ -57,3 +57,25 @@ uv run python scripts/lab12_audit.py --model logistic
 uv run python scripts/lab12_audit.py --model tree
 uv run python scripts/validate_lab12_decision.py
 ```
+
+
+## 6. LAB13 · puertas adicionales derivadas del LAB12
+
+**Contexto.** Los umbrales por defecto del base (`max_recall_gap: 0.16`) producen una decisión **GO**
+con el modelo logístico: recall 0,7174, brecha 0,1376, FPR 0,1250, latencia 0,016 ms y modelo de
+3,56 KB. La tolerancia que el estudiante acordó en el LAB12 (brecha ≤ 0,10 y recall del grupo con
+peor desempeño ≥ 0,70) no se cumple.
+
+**Cambios.**
+
+| Archivo | Cambio | Motivo |
+|---|---|---|
+| `configs/governance.yml` | Se **conservan** los cinco umbrales del base y se añaden `min_worst_group_recall: 0.70`, `max_recall_gap_pilot: 0.10` y `min_intersectional_support: 15`, más las secciones `inventory`, `minimization`, `retention`, `monitoring`, `incident` y `appeal` | Traducir la tolerancia del LAB12 a una puerta ejecutable, y documentar inventario, retención y monitoreo |
+| `src/inf8239_u04/governance.py` | `deployment_decision` evalúa las tres puertas nuevas **solo si están declaradas** | Con los umbrales por defecto el comportamiento es idéntico al base (verificado por `tests/test_governance.py`) |
+| `src/inf8239_u04/pipeline.py` | Calcula `worst_group_recall`, `worst_group` y `min_intersectional_support` | Métricas que las puertas nuevas necesitan |
+| `app.py` | Muestra las puertas fallidas, el inventario, la retención y el canal de apelación | El manual exige que el tablero exponga propósito, límites, métricas, grupos, puertas, recomendación y acción humana |
+| `scripts/simulate_incident.py` | Se completa el postmortem del simulacro (señal, severidad, contención, autoridad, evidencia, comunicación, rollback, acciones correctivas con responsables y fechas) | El base dejaba `REPLACE` en comunicación y acciones correctivas |
+
+**Verificación:** `uv run pytest -q` → 10 passed; `uv run python scripts/lab13_governance.py` →
+`reports/lab13/deployment_decision.json` con `status: REVIEW` y las tres puertas fallidas; el
+simulacro genera `reports/lab13/INCIDENT_POSTMORTEM.md`.

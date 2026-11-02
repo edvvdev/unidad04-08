@@ -39,6 +39,41 @@ referencia, cifra o evidencia fue inventada: todas provienen de `reports/lab11/`
 5. «No inventes evidencia: toda cifra debe salir de un archivo de `reports/` y toda referencia debe
    poder verificarse.»
 
+## Ejercicio 08 (LAB13) · prompts, verificaciones y correcciones
+
+**Prompts relevantes**
+
+1. «Del inventario de campos a la decisión: cada campo con origen, uso, condición de entrada al
+   modelo, plazo de retención y justificación; y las columnas de identificadores directos rechazadas
+   antes de predecir.»
+2. «RACI con un único responsable final por actividad y traspaso explícito entre roles; y que
+   ningún rol del equipo de datos pueda reactivar el sistema.»
+3. «Convierte la tolerancia acordada en el LAB12 en puertas ejecutables: si una puerta falla, el
+   sistema degrada a REVIEW o STOP y nunca se oculta.»
+4. «Simulacro de incidente con detección, contención, preservación de evidencia, comunicación,
+   rollback y postmortem con responsables y fechas.»
+5. «Distingue obligación legal, marco voluntario y recomendación ética, y explica la decisión final:
+   desplegar, modificar, limitar o no utilizar.»
+
+**Verificaciones que el estudiante debe repetir**
+
+- [ ] `uv sync --frozen && uv run pytest -q` → 10 passed (incluye la prueba de la app sin navegador).
+- [ ] `uv run python scripts/lab13_governance.py` → `reports/lab13/deployment_decision.json` con
+      `status: REVIEW` y las tres puertas fallidas.
+- [ ] `uv run python scripts/simulate_incident.py` → `reports/lab13/INCIDENT_POSTMORTEM.md` con
+      comunicación, rollback y acciones correctivas con responsables y fechas.
+- [ ] `uv run streamlit run app.py` → el tablero muestra estado REVIEW, las puertas fallidas, el
+      inventario, la retención y la acción humana.
+- [ ] `git tag u04-lab13` sobre el commit de cierre.
+
+**Correcciones realizadas**
+
+| Corrección | Causa | Verificación |
+|---|---|---|
+| Puertas de equidad derivadas del LAB12 añadidas a la configuración y al evaluador | Con los umbrales por defecto el sistema daba GO y la decisión documentada era LIMITAR | La decisión del pipeline es REVIEW con tres puertas fallidas |
+| `app.py` muestra puertas fallidas, inventario y retención | El tablero base solo mostraba propósito, métricas y resumen de puertas | La prueba `tests/test_app.py` sigue en verde y el tablero expone la evidencia de gobernanza |
+| Postmortem del simulacro completado | El base dejaba `REPLACE` en comunicación y acciones correctivas | `reports/lab13/INCIDENT_POSTMORTEM.md` con responsables y fechas |
+
 ## Verificaciones que el estudiante debe repetir
 
 - [ ] `uv sync --frozen` y `uv run pytest -q` → 10 passed.

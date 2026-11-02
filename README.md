@@ -1,9 +1,13 @@
-# INF-8239 · Ejercicio 07 · Evaluación de impacto y auditoría de equidad
+# INF-8239 · Ejercicios 07 y 08 · Impacto, equidad, gobernanza y simulacro
 
-Autor académico: Edwin Ramón José Nolasco · Repositorio: https://github.com/edvvdev/unidad04-07
+Autor académico: Edwin Ramón José Nolasco
 
-Expediente reproducible que integra **LAB11** (evaluación de impacto ético) y **LAB12** (auditoría de
-equidad con Fairlearn) sobre el caso territorial **sintético** del proyecto base del profesor. El
+| Entrega | Repositorio | Contenido |
+|---|---|---|
+| **Ejercicio 07** (LAB11 + LAB12) | https://github.com/edvvdev/unidad04-07 | Evaluación de impacto, registro de riesgos, auditoría de equidad y decisión LIMITAR |
+| **Ejercicio 08** (LAB13) | https://github.com/edvvdev/unidad04-08 | Inventario y retención, RACI, puertas de gobernanza, runbook, simulacro de incidente y DSS gobernado |
+
+Proyecto reproducible sobre el caso territorial **sintético** del proyecto base del profesor. El
 dataset no representa personas, zonas ni estadísticas reales de República Dominicana.
 
 ## Inicio
@@ -27,6 +31,32 @@ uv run python scripts/check_environment.py        # dataset_status: valid · 640
 El script hace: entorno → pruebas → LAB11 → LAB12 (logística y árbol) → notebook ejecutado →
 PDF de síntesis. Instala además Jupyter, `reportlab` y `matplotlib`, que **no** vienen en el grupo
 de desarrollo del proyecto base (`uv sync` solo instala pytest, pytest-cov y ruff).
+
+## Entrega del Ejercicio 08 (LAB13)
+
+| Elemento | Dónde está |
+|---|---|
+| Notebook ejecutado | `notebooks/02_ejercicio08_gobernanza_dss.ipynb` (13 celdas, con salidas) |
+| Artefactos editables | `configs/governance.yml` (inventario, minimización, retención, monitoreo, incidente, apelación), `student_inputs/raci.csv` (12 actividades) |
+| Evidencia | `reports/lab13/deployment_decision.json`, `fairness_by_group.csv`, `INCIDENT_POSTMORTEM.md`, `ejercicio08_resumen.json` |
+| Documentos | `docs/MODEL_CARD.md`, `docs/RUNBOOK.md`, `docs/INVENTARIO_Y_RETENCION.md`, `docs/DATASET_CARD.md` |
+| PDF de síntesis | `docs/EJERCICIO_08_PDF_SINTESIS.pdf` (4 páginas) |
+| Pruebas | `uv run pytest -q` → 10 passed (incluye la prueba de la app de Streamlit sin navegador) |
+
+```bash
+uv run python scripts/lab13_governance.py      # pipeline gobernado -> reports/lab13/
+uv run python scripts/simulate_incident.py     # simulacro -> reports/lab13/INCIDENT_POSTMORTEM.md
+uv run streamlit run app.py                    # tablero con propósito, límites, puertas y acción humana
+```
+
+**Decisión del pipeline: REVIEW.** Con los umbrales por defecto del proyecto base (brecha de recall
+≤ 0,16) sería GO; con la tolerancia acordada en el LAB12 (brecha ≤ 0,10 y recall del peor grupo
+≥ 0,70) fallan tres puertas —`worst_group_recall` (0,6531), `recall_gap_pilot` (0,1376) e
+`intersectional_support` (8)— y la decisión es REVIEW, con revisión humana obligatoria y el baseline
+sin modelo como camino operativo seguro.
+
+**Decisión final: LIMITAR** (piloto en modo REVIEW, revisión trimestral el 2027-01-15, condiciones
+de retiro en el runbook).
 
 ## Entrega del Ejercicio 07
 
