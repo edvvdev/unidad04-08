@@ -4,11 +4,119 @@ prohibited_uses:
   - automatic intervention
   - eligibility decision
   - emergency declaration
+  - sanction or sanctioning decision
+  - allocation of funds between zones
+  - reuse of the queue or the model for any other purpose
 sensitive_features: [protected_group, age_band]
 direct_identifiers: [name, document_number, email, phone]
+
+# Puertas de calidad. Las cinco primeras son las del proyecto base; las tres siguientes
+# traducen la tolerancia acordada en el LAB12 (student_inputs/lab12_decision.yml) y son las que
+# hacen que la decision del sistema no sea GO mientras la auditoria no se repita con evidencia nueva.
 gates:
   min_recall: 0.68
   max_recall_gap: 0.16
   max_fpr_gap: 0.16
   max_latency_ms: 500
   max_model_kb: 1024
+  min_worst_group_recall: 0.70        # recall del grupo con peor desempeño (tolerancia LAB12)
+  max_recall_gap_pilot: 0.10          # brecha de recall tolerada en modo piloto (LAB12)
+  min_intersectional_support: 15      # observaciones mínimas para interpretar una celda (LAB12)
+
+# Inventario, minimizacion y retencion (criterio 1 del Ejercicio 08).
+inventory:
+  - name: case_id
+    origin: territorial_risk_synthetic.csv
+    purpose: trazabilidad interna del caso sintetico
+    used_as_feature: false
+    retention_days: 730
+    justification: identificador del registro sintetico; no contiene datos de personas
+  - name: received_date
+    origin: territorial_risk_synthetic.csv
+    purpose: corte temporal y deteccion de deriva
+    used_as_feature: false
+    retention_days: 730
+    justification: fecha sintetica de recepcion; no se usa como variable predictora
+  - name: zone
+    origin: territorial_risk_synthetic.csv
+    purpose: variable predictora
+    used_as_feature: true
+    retention_days: 365
+    justification: contexto territorial sintetico, disponible al predecir
+  - name: age_band
+    origin: territorial_risk_synthetic.csv
+    purpose: variable predictora y auditoria interseccional
+    used_as_feature: true
+    retention_days: 365
+    justification: banda de edad sintetica, disponible al predecir
+  - name: previous_incidents
+    origin: territorial_risk_synthetic.csv
+    purpose: variable predictora
+    used_as_feature: true
+    retention_days: 365
+    justification: historial de incidentes reportados
+  - name: infrastructure_score
+    origin: territorial_risk_synthetic.csv
+    purpose: variable predictora
+    used_as_feature: true
+    retention_days: 365
+    justification: indice sintetico de infraestructura
+  - name: exposure
+    origin: territorial_risk_synthetic.csv
+    purpose: variable predictora
+    used_as_feature: true
+    retention_days: 365
+    justification: exposicion sintetica al evento
+  - name: protected_group
+    origin: territorial_risk_synthetic.csv
+    purpose: auditoria de equidad por grupo; nunca entra al modelo
+    used_as_feature: false
+    retention_days: 365
+    justification: atributo sensible conservado solo para auditar resultados
+  - name: target
+    origin: territorial_risk_synthetic.csv
+    purpose: etiqueta para entrenamiento y evaluacion
+    used_as_feature: false
+    retention_days: 730
+    justification: etiqueta sintetica
+
+minimization:
+  principle: solo se conservan los campos que la finalidad requiere y se registra la justificacion
+  excluded_from_model: [case_id, received_date, protected_group, target]
+  prohibited_ever: [name, document_number, email, phone]
+  reidentification_risk: bajo; el caso es sintetico y no contiene datos de personas
+
+retention:
+  operational_events_days: 180
+  review_logs_days: 365
+  models_and_reports_days: 730
+  appeals_records_days: 1095
+  deletion_owner: Data Engineer
+  deletion_approver: Legal and Data Protection Officer
+
+monitoring:
+  frequency: monthly
+  metrics: [accuracy, recall, recall_gap, fpr_gap, worst_group_recall, latency_ms, model_kb]
+  alert_thresholds:
+    recall_below: 0.68
+    recall_gap_above: 0.10
+    fpr_gap_above: 0.16
+    latency_ms_above: 500
+    model_kb_above: 1024
+  drift_reference: corte temporal 2026-09-24/25 con 480 registros de entrenamiento y 160 de prueba
+  reporting_owner: Institutional Owner
+
+incident:
+  detection: comparacion mensual de las metricas contra los umbrales de alert_thresholds
+  severity_levels: [baja, media, alta]
+  containment_authority: Institutional Owner
+  rollback_target: version anterior del modelo o baseline sin modelo (cola por severidad reportada)
+  evidence_preservation: logs, version del modelo, metricas y reporte de incidente inmutables
+  communication: responsable del programa y personas agraviadas segun el canal de apelacion
+  postmortem_owner: ML Engineer
+
+appeal:
+  channel: registro de apelaciones con respuesta del responsable en un plazo definido
+  owner: Responsible for Equity
+  records_days: 1095
+  feedback_loop: los casos apelados se revisan en la auditoria trimestral de equidad

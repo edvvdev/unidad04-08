@@ -19,5 +19,12 @@ def deployment_decision(metrics, gaps, resources, gates):
       "latency": resources["latency_ms"] <= gates["max_latency_ms"],
       "model_size": resources["model_kb"] <= gates["max_model_kb"],
     }
+    # Puertas adicionales (LAB12): solo se evaluan si estan declaradas en la configuracion.
+    if "min_worst_group_recall" in gates:
+        checks["worst_group_recall"] = metrics.get("worst_group_recall", 0.0) >= gates["min_worst_group_recall"]
+    if "max_recall_gap_pilot" in gates:
+        checks["recall_gap_pilot"] = gaps["recall_gap"] <= gates["max_recall_gap_pilot"]
+    if "min_intersectional_support" in gates:
+        checks["intersectional_support"] = resources.get("min_intersectional_support", 0) >= gates["min_intersectional_support"]
     failed=[k for k,v in checks.items() if not v]
     return {"status":"GO" if not failed else "REVIEW", "checks":checks, "failed":failed, "human_action":"Document review and final decision"}
