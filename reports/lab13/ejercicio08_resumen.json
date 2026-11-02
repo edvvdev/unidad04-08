@@ -1,0 +1,24 @@
+{
+  "decision_final": "LIMITAR",
+  "decision_maquina": "REVIEW",
+  "puertas_fallidas": [
+    "worst_group_recall",
+    "recall_gap_pilot",
+    "intersectional_support"
+  ],
+  "gates_base": {
+    "min_recall": 0.68,
+    "max_recall_gap": 0.16,
+    "max_fpr_gap": 0.16,
+    "max_latency_ms": 500,
+    "max_model_kb": 1024
+  },
+  "gates_lab12": {
+    "min_worst_group_recall": 0.7,
+    "max_recall_gap_pilot": 0.1,
+    "min_intersectional_support": 15
+  },
+  "baseline_sin_modelo": "prioridad por severidad reportada con revision humana",
+  "supervision_humana": "obligatoria; el DSS no decide",
+  "proxima_revision": "2027-01-15"
+}
