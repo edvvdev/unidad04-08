@@ -31,6 +31,14 @@ def negritas(texto: str) -> str:
     return re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", texto)
 
 
+
+def imagen_segura(ruta, ancho_cm, alto_cm):
+    """Añade la imagen si existe; si no, una nota para que no se rompa la generación del PDF."""
+    if Path(ruta).exists():
+        return Image(str(ruta), width=ancho_cm * cm, height=alto_cm * cm)
+    return Paragraph(f"[Figura no generada: {Path(ruta).name}. Se produce con scripts/make_figures.py]",
+                      styles["Small"])
+
 styles = getSampleStyleSheet()
 styles.add(ParagraphStyle(name="Title2", parent=styles["Title"], fontSize=17, spaceAfter=6))
 styles.add(ParagraphStyle(name="H1s", parent=styles["Heading1"], fontSize=12, spaceBefore=9, spaceAfter=3))
@@ -98,7 +106,7 @@ story.append(Paragraph(
     "revisión 365, modelos y reportes 730, registros de apelación 1.095; la supresión la ejecuta el "
     "Data Engineer con aprobación del Legal and Data Protection Officer.", styles["Small"]))
 story.append(Spacer(1, 4))
-story.append(Image(str(REPORTS / "lab13/inventario_retencion.png"), width=13.5 * cm, height=6.6 * cm))
+story.append(imagen_segura(REPORTS / "lab13/inventario_retencion.png", 13.5, 6.6))
 story.append(PageBreak())
 
 story.append(Paragraph("2. Datasheet y Model Card trazables", styles["H1s"]))
@@ -157,7 +165,7 @@ tabla_raci.setStyle(TableStyle([
 ]))
 story.append(tabla_raci)
 story.append(Spacer(1, 4))
-story.append(Image(str(REPORTS / "lab13/raci_responsables.png"), width=12.5 * cm, height=5.5 * cm))
+story.append(imagen_segura(REPORTS / "lab13/raci_responsables.png", 12.5, 5.5))
 story.append(PageBreak())
 
 story.append(Paragraph("4. Monitoreo, runbook y simulacro", styles["H1s"]))
@@ -196,7 +204,7 @@ tabla_puertas.setStyle(TableStyle([
 ]))
 story.append(tabla_puertas)
 story.append(Spacer(1, 4))
-story.append(Image(str(REPORTS / "lab13/puertas_calidad.png"), width=13.5 * cm, height=6.6 * cm))
+story.append(imagen_segura(REPORTS / "lab13/puertas_calidad.png", 13.5, 6.6))
 story.append(Spacer(1, 4))
 story.append(Paragraph(
     "<b>Simulacro de incidente.</b> Señal: la brecha de recall (0,1376) supera la tolerancia de "

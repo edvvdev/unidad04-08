@@ -31,6 +31,7 @@ if ($Objetivo -in @("ej07", "todo")) {
         uv run python -m jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=3600 notebooks/01_ejercicio07_impacto_equidad.ipynb
     } else { Write-Host "    OMITIDO por SKIP_NOTEBOOK=1" -ForegroundColor DarkGray }
     if (-not $env:REPO_URL_E07) { $env:REPO_URL_E07 = "https://github.com/edvvdev/unidad04-07" }
+    uv run python scripts/make_figures.py
     $env:REPO_URL = $env:REPO_URL_E07
     uv run python scripts/build_ejercicio07_pdf.py
 }
@@ -51,6 +52,7 @@ if ($Objetivo -in @("ej08", "todo")) {
         uv run python -m jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=3600 notebooks/02_ejercicio08_gobernanza_dss.ipynb
     } else { Write-Host "    OMITIDO por SKIP_NOTEBOOK=1" -ForegroundColor DarkGray }
     if (-not $env:REPO_URL_E08) { $env:REPO_URL_E08 = "https://github.com/edvvdev/unidad04-08" }
+    uv run python scripts/make_figures.py
     $env:REPO_URL = $env:REPO_URL_E08
     uv run python scripts/build_ejercicio08_pdf.py
 }

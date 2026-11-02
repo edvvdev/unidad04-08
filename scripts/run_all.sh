@@ -42,6 +42,7 @@ if [ "$OBJETIVO" = "ej07" ] || [ "$OBJETIVO" = "todo" ]; then
   else
     echo "    OMITIDO por SKIP_NOTEBOOK=1"
   fi
+  uv run python scripts/make_figures.py
   REPO_URL="${REPO_URL_E07:-https://github.com/edvvdev/unidad04-07}" \
     uv run python scripts/build_ejercicio07_pdf.py
 fi
@@ -66,6 +67,7 @@ if [ "$OBJETIVO" = "ej08" ] || [ "$OBJETIVO" = "todo" ]; then
   else
     echo "    OMITIDO por SKIP_NOTEBOOK=1"
   fi
+  uv run python scripts/make_figures.py
   REPO_URL="${REPO_URL_E08:-https://github.com/edvvdev/unidad04-08}" \
     uv run python scripts/build_ejercicio08_pdf.py
 fi
