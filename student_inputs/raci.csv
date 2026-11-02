@@ -1,5 +1,13 @@
 activity,R,A,C,I
-Data quality,Data Engineer,Product Owner,Data Scientist,Affected representatives
-Model validation,Data Scientist,Product Owner,Data Engineer,Affected representatives
-Deployment,ML Engineer,Product Owner,Data Scientist,Users
-Incident response,ML Engineer,Institutional Owner,Legal and Data Scientist,Affected representatives
+Data quality and data contract,Data Engineer,Product Owner,Data Scientist,Affected representatives
+Privacy review and prohibited columns,Data Engineer,Legal and Data Protection Officer,Data Scientist,Affected representatives
+Model validation and reproducibility,Data Scientist,Product Owner,Data Engineer,Users
+"Fairness audit (global, group and intersectional)",Data Scientist,Responsible for Equity,Legal and Data Protection Officer,Affected representatives
+Impact assessment and alternative comparison,Data Scientist,Institutional Owner,Responsible for Equity,Affected representatives
+Deployment approval of the governed DSS,ML Engineer,Product Owner,Data Scientist,Users
+Daily operation and human review of the queue,Operations Analyst,Product Owner,ML Engineer,Affected representatives
+"Monitoring, drift review and quarterly report",ML Engineer,Institutional Owner,Data Scientist,Users
+"Incident detection, containment and rollback",ML Engineer,Institutional Owner,Legal and Data Protection Officer,Affected representatives
+Appeal handling of affected persons,Responsible for Equity,Institutional Owner,Operations Analyst,Affected representatives
+"Retention, deletion and expiry of evidence",Data Engineer,Legal and Data Protection Officer,Data Scientist,Affected representatives
+"Model revision, retirement or decommissioning",Data Scientist,Institutional Owner,Product Owner,Users

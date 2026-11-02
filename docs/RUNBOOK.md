@@ -1,8 +1,81 @@
-# Incident Runbook — complete after LAB13
+# Incident Runbook · DSS territorial sintético (LAB13 · Ejercicio 08)
 
-1. Detection and classification: REPLACE
-2. Containment authority: REPLACE
-3. Evidence preservation: REPLACE
-4. Internal and affected-party communication: REPLACE
-5. Rollback or safe baseline: REPLACE
-6. Postmortem, owner and due date: REPLACE
+Proyecto: `INF8239_U04_Gobernanza_DSS` · Fecha: 2026-11-02
+Simulacro ejecutado: `uv run python scripts/simulate_incident.py` →
+`reports/lab13/INCIDENT_POSTMORTEM.md`.
+
+## 1. Detección y clasificación
+
+**Qué se vigila.** Comparación **mensual** de las métricas del pipeline contra
+`configs/governance.yml → monitoring.alert_thresholds`: recall (≥ 0,68), brecha de recall (≤ 0,10 en
+piloto), brecha de FPR (≤ 0,16), latencia (≤ 500 ms) y tamaño del modelo (≤ 1024 KB). Además se
+vigila la **deriva**: comparación de la distribución de la zona, la banda de edad y la tasa de
+reportes frente a la referencia del corte temporal 2026-09-24/25.
+
+**Cómo se detecta.** El pipeline gobernado (`scripts/lab13_governance.py`) escribe
+`reports/lab13/deployment_decision.json` en cada ejecución; si alguna puerta falla, el estado pasa de
+GO a **REVIEW** y se genera la alerta. En el simulacro, la señal fue la brecha de recall (0,1376)
+por encima de la tolerancia de piloto (0,10).
+
+**Clasificación de severidad.**
+
+| Severidad | Criterio | Acción inmediata |
+|---|---|---|
+| Baja | Una puerta de desempeño falla; no hay acción sobre personas | Corrección técnica y nota en la revisión |
+| Media | Una puerta de equidad falla, o el soporte interseccional es insuficiente | **REVIEW**: se congela la priorización automática y se vuelve al baseline sin modelo |
+| Alta | Acción sobre personas sin revisión humana, uso fuera de alcance o fuga de datos | **STOP**: retiro inmediato, contención y notificación a Legal |
+
+## 2. Autoridad de contención
+
+- **Ordena la contención:** Institutional Owner (único *accountable*).
+- **Ejecuta el rollback:** ML Engineer.
+- **Valida la comunicación:** Legal and Data Protection Officer.
+- **Informa a los representantes de las personas afectadas:** Responsible for Equity, por el canal de
+  apelaciones.
+- **Ninguna persona del equipo de datos puede reactivar el sistema**: la reactivación exige que todas
+  las puertas vuelvan a estar en verde y una nueva revisión documentada.
+
+## 3. Preservación de evidencia
+
+Ante un incidente se conserva **de forma inmutable**: logs de ejecución, versión del modelo
+(`models/logistic.joblib`), métricas globales y por grupo e interseccional (`reports/lab12/`,
+`reports/lab13/`), el reporte de incidente con su clasificación, el commit exacto del código y la
+configuración vigente (`configs/governance.yml`). Nada se borra ni se sobrescribe hasta el cierre
+formal; la retención de logs y reportes es de 365 días y la de modelos de 730 días
+(`configs/governance.yml → retention`).
+
+## 4. Comunicación interna y a las personas afectadas
+
+- **Interna (≤ 24 h):** Institutional Owner informa a Product Owner, Operaciones, Data Scientist y
+  Legal; se publica el estado (REVIEW o STOP) y el motivo en el canal de incidente.
+- **A las personas afectadas (≤ 72 h):** por el canal de apelaciones, indicando de forma clara que
+  el sistema **no decide** y que toda acción sobre una persona la revisó una persona responsable.
+  No se comparten identificadores ni datos personales en la comunicación.
+- **Mensaje prohibited:** no afirmar que el sistema "detecta"-who "identifica" a personas ni que una
+  persona está en riesgo por pertenecer a un grupo.
+
+## 5. Rollback o baseline seguro
+
+**Destino del rollback:** (1) la versión anterior del modelo si su evaluación superaba las puertas, o
+(2) el **baseline sin modelo**: cola priorizada por severidad reportada, con revisión humana de cada
+caso. El rollback se ejecuta sin downtime para el equipo: el proceso operativo siempre tiene un
+camino que no depende del modelo.
+
+**Verificación posterior a la activación:** las puertas de desempeño y equidad deben volver a estar en
+verde **antes** de reactivar la priorización automática; si la brecha sigue fuera de tolerancia, el
+sistema permanece en REVIEW con decisión humana documentada.
+
+## 6. Postmortem, responsable y fecha
+
+| Campo | Contenido |
+|---|---|
+| Documento | `reports/lab13/INCIDENT_POSTMORTEM.md` (generado por el simulacro) |
+| Responsable | ML Engineer |
+| Aprobador | Institutional Owner |
+| Fecha límite de acciones correctivas | 2026-12-15 (auditoría con periodo posterior e intervalos de confianza) |
+| Entrada de learnings | Revisión trimestral; las acciones correctivas se verifican en la siguiente revisión |
+
+**Lecciones del simulacro:** con los umbrales por defecto del proyecto base (brecha ≤ 0,16) la
+decisión habría sido GO; la tolerancia acordada en el LAB12 es más estricta y es la que debe gobernar
+el sistema. Además, el simulacro mostró que el tablero debe mostrar **el estado REVIEW y las puertas
+fallidas** de forma visible, no solo el resumen de métricas.
