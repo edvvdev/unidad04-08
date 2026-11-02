@@ -19,18 +19,28 @@ uv run pytest -q                                  # 10 passed
 uv run python scripts/check_environment.py        # dataset_status: valid · 640 filas
 ```
 
-## Ejecución completa (un solo comando)
+## Ejecución completa
 
 ```bash
-./scripts/run_all.sh          # macOS / Linux
+./scripts/run_all.sh            # macOS / Linux: todo (E07 + E08)
+./scripts/run_all.sh ej07       # solo Ejercicio 07 (LAB11 + LAB12)
+./scripts/run_all.sh ej08       # solo Ejercicio 08 (LAB13), reutilizando la evidencia de LAB11-12
 ```
 ```powershell
-.\scripts\run_all.ps1        # Windows
+.\scripts\run_all.ps1          # Windows
+.\scripts\run_all.ps1 ej07
+.\scripts\run_all.ps1 ej08
 ```
 
-El script hace: entorno → pruebas → LAB11 → LAB12 (logística y árbol) → notebook ejecutado →
-PDF de síntesis. Instala además Jupyter, `reportlab` y `matplotlib`, que **no** vienen en el grupo
-de desarrollo del proyecto base (`uv sync` solo instala pytest, pytest-cov y ruff).
+El script hace: entorno → pruebas → LAB11 → LAB12 (logística y árbol) → notebook del E07 → PDF del
+E07 → LAB13 (pipeline gobernado y simulacro) → notebook del E08 → PDF del E08 → revisión de
+artefactos. Instala además Jupyter, `reportlab` y `matplotlib`, que **no** vienen en el grupo de
+desarrollo del proyecto base (`uv sync` solo instala pytest, pytest-cov y ruff).
+
+**Los dos ejercicios comparten proyecto** porque el manual de la Unidad 04 pide trabajar siempre
+sobre la misma copia durante LAB11–13; la separación es de **entrega**: un PDF de síntesis y un
+repositorio por ejercicio (`unidad04-07` y `unidad04-08`), y los PDF de cada uno apuntan a su
+repositorio.
 
 ## Entrega del Ejercicio 08 (LAB13)
 
