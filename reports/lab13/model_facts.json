@@ -1,14 +1,14 @@
 {
   "logistic": {
-    "training_seconds": 0.019056299999647308,
-    "latency_ms": 0.01604986875349823,
+    "training_seconds": 0.0194172539995634,
+    "latency_ms": 0.01830576252359606,
     "model_kb": 3.5634765625,
     "parametros": 12,
     "detalle_parametros": "11 coeficientes + 1 intercepto",
     "artefacto": "models/logistic.joblib"
   },
   "tree": {
-    "training_seconds": 0.012833418999889545,
+    "training_seconds": 0.017395108996424824,
     "model_kb": 7.9013671875,
     "parametros": 51,
     "detalle_parametros": "nodos del árbol",

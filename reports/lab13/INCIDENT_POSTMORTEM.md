@@ -1,6 +1,6 @@
 # Postmortem de incidente simulado
 
-- detected_at: 2026-11-05T23:10:15.424442+00:00
+- detected_at: 2026-11-05T23:30:48.315244+00:00
 - signal: recall gap exceeded
 - signal_detail: la brecha de recall entre grupos (0.1376) supera la tolerancia de piloto acordada en el LAB12 (0.10); ademas el recall del grupo con peor desempeño (G1: 0.6531) queda por debajo del minimo de 0.70 y hay 3 celdas interseccionales con soporte insuficiente (G2 | 45-59 (n=8), G2 | 18-29 (n=11), G2 | 30-44 (n=14); umbral 15 observaciones)
 - detection: comparacion mensual de las metricas contra los umbrales de configs/governance.yml (monitoring.alert_thresholds), con la puerta de equidad como disparador principal

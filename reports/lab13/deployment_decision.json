@@ -10,9 +10,9 @@
     "fpr_gap": 0.125
   },
   "resources": {
-    "training_seconds": 0.019056299999647308,
+    "training_seconds": 0.0194172539995634,
     "model_kb": 3.5634765625,
-    "latency_ms": 0.01604986875349823,
+    "latency_ms": 0.01830576252359606,
     "min_intersectional_support": 8
   },
   "decision": {

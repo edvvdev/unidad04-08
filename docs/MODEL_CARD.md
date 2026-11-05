@@ -100,8 +100,8 @@ Límites de la evidencia: una sola partición temporal, una sola semilla, sin in
 
 | Evidencia | Logística (configuración elegida) | Árbol (alternativa descartada) |
 |---|---|---|
-| Tiempo de ajuste (s) | 0,0191 | 0,0128 |
-| Latencia por registro (ms) | 0,0160 | no medida |
+| Tiempo de ajuste (s) | 0,0194 | 0,0174 |
+| Latencia por registro (ms) | 0,0183 | no medida |
 | Tamaño serializado (KB) | 3,56 | 7,90 |
 | Parámetros entrenables | 12 (11 coeficientes + 1 intercepto) | 51 (nodos del árbol) |
 
@@ -116,7 +116,7 @@ La logística se elige por ocupar 3,56 KB frente a 7,90 KB del árbol, con la mi
 | Recall global | ≥ 0,6800 | 0,7174 | correcta |
 | Brecha de recall (umbral del base) | ≤ 0,1600 | 0,1376 | correcta |
 | Brecha de FPR | ≤ 0,1600 | 0,1250 | correcta |
-| Latencia por registro (ms) | ≤ 500 | 0,0160 | correcta |
+| Latencia por registro (ms) | ≤ 500 | 0,0183 | correcta |
 | Tamaño del modelo (KB) | ≤ 1024 | 3,56 | correcta |
 | Recall del peor grupo | ≥ 0,7000 | 0,6531 | **FALLA** |
 | Brecha de recall en modo piloto | ≤ 0,1000 | 0,1376 | **FALLA** |
