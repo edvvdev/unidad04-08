@@ -2,10 +2,12 @@ import time
 
 import pandas as pd
 from sklearn.metrics import accuracy_score, recall_score
+
 from .data import features, temporal_split
 from .fairness import audit, gap, intersectional
 from .governance import deployment_decision
 from .model import build_model, fit_measure
+
 
 def run(df, gates, kind="logistic"):
     train,test=temporal_split(df); model=build_model(kind); resources=fit_measure(model,features(train),train.target)

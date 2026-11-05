@@ -1,11 +1,13 @@
 import time
 from pathlib import Path
+
 import joblib
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.tree import DecisionTreeClassifier
+
 
 def build_model(kind="logistic"):
     prep = ColumnTransformer([

@@ -177,31 +177,47 @@ def seccion_evaluacion() -> str:
             int(g1["count"]), int(g2["count"])
         ),
         "|---|---|---|---|---|\n",
-        f"| Accuracy | {dec(g1['accuracy'], 3)} | {dec(g2['accuracy'], 3)} | "
-        f"{dec(diferencias['accuracy'])} | `reports/lab12/logistic/fairness_by_group.csv` |\n",
-        f"| Recall (TPR) | {dec(g1['recall'], 3)} | {dec(g2['recall'], 3)} | "
-        f"**{dec(diferencias['recall'])}** | ídem |\n",
-        f"| Precisión | {dec(g1['precision'], 3)} | {dec(g2['precision'], 3)} | "
-        f"{dec(diferencias['precision'])} | ídem |\n",
+        (
+            f"| Accuracy | {dec(g1['accuracy'], 3)} | {dec(g2['accuracy'], 3)} | "
+            f"{dec(diferencias['accuracy'])} | `reports/lab12/logistic/fairness_by_group.csv` |\n"
+        ),
+        (
+            f"| Recall (TPR) | {dec(g1['recall'], 3)} | {dec(g2['recall'], 3)} | "
+            f"**{dec(diferencias['recall'])}** | ídem |\n"
+        ),
+        (
+            f"| Precisión | {dec(g1['precision'], 3)} | {dec(g2['precision'], 3)} | "
+            f"{dec(diferencias['precision'])} | ídem |\n"
+        ),
         f"| FPR | {dec(g1['fpr'], 3)} | {dec(g2['fpr'], 3)} | {dec(diferencias['fpr'])} | ídem |\n",
-        f"| Tasa de selección | {dec(g1['selection_rate'], 3)} | {dec(g2['selection_rate'], 3)} | "
-        f"{dec(diferencias['selection_rate'])} | ídem |\n",
+        (
+            f"| Tasa de selección | {dec(g1['selection_rate'], 3)} | {dec(g2['selection_rate'], 3)} | "
+            f"{dec(diferencias['selection_rate'])} | ídem |\n"
+        ),
         "\n",
-        f"El grupo con peor recall es **{DECISION['metrics']['worst_group']}** "
-        f"({dec(DECISION['metrics']['worst_group_recall'])}).\n",
+        (
+            f"El grupo con peor recall es **{DECISION['metrics']['worst_group']}** "
+            f"({dec(DECISION['metrics']['worst_group_recall'])}).\n"
+        ),
         "\n",
         "### 4.3 Tasas base de positivos (prevalencia por grupo)\n",
         "\n",
         "| Corte | G1 | G2 |\n",
         "|---|---|---|\n",
-        f"| Datos completos ({DATOS['dataset']['filas']} registros) | {pct(rates['G1']['tasa'])} | "
-        f"{pct(rates['G2']['tasa'])} |\n",
-        f"| Prueba temporal ({DATOS['dataset']['corte_temporal']['filas_prueba']} registros) | "
-        f"{pct(rates_prueba['G1']['tasa'])} | {pct(rates_prueba['G2']['tasa'])} |\n",
+        (
+            f"| Datos completos ({DATOS['dataset']['filas']} registros) | {pct(rates['G1']['tasa'])} | "
+            f"{pct(rates['G2']['tasa'])} |\n"
+        ),
+        (
+            f"| Prueba temporal ({DATOS['dataset']['corte_temporal']['filas_prueba']} registros) | "
+            f"{pct(rates_prueba['G1']['tasa'])} | {pct(rates_prueba['G2']['tasa'])} |\n"
+        ),
         "\n",
-        "Esta diferencia de prevalencia es el hecho central de la auditoría: parte de la brecha de "
-        "recall puede reflejar la distinta tasa base de positivos y no una decisión discriminatoria "
-        "del modelo. La brecha observada **no prueba discriminación causal**.\n",
+        (
+            "Esta diferencia de prevalencia es el hecho central de la auditoría: parte de la brecha de "
+            "recall puede reflejar la distinta tasa base de positivos y no una decisión discriminatoria "
+            "del modelo. La brecha observada **no prueba discriminación causal**.\n"
+        ),
         "\n",
         "### 4.4 Celdas interseccionales (grupo | banda de edad) y su soporte\n",
         "\n",
@@ -355,13 +371,17 @@ def main() -> None:
     partes = [
         "# Model Card · DSS territorial sintético (LAB13 · Ejercicio 08)\n",
         "\n",
-        "Proyecto: `INF8239_U04_Gobernanza_DSS` · Unidad 04 · Ejercicio 08 (LAB13) · "
-        "decisión documentada: **LIMITAR**\n",
+        (
+            "Proyecto: `INF8239_U04_Gobernanza_DSS` · Unidad 04 · Ejercicio 08 (LAB13) · "
+            "decisión documentada: **LIMITAR**\n"
+        ),
         "\n",
-        "> Documento **generado** por `scripts/build_model_card.py`. Todas las cifras proceden de "
-        "`reports/` (`lab12/logistic/*`, `lab13/deployment_decision.json`, "
-        "`lab13/dataset_stats.json`, `lab13/model_facts.json`) y de `configs/governance.yml`: en esta "
-        "tarjeta no hay ninguna cifra escrita a mano.\n",
+        (
+            "> Documento **generado** por `scripts/build_model_card.py`. Todas las cifras proceden de "
+            "`reports/` (`lab12/logistic/*`, `lab13/deployment_decision.json`, "
+            "`lab13/dataset_stats.json`, `lab13/model_facts.json`) y de `configs/governance.yml`: en esta "
+            "tarjeta no hay ninguna cifra escrita a mano.\n"
+        ),
         "\n",
         seccion_uso_previsto(),
         "\n",

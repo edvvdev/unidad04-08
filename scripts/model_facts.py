@@ -18,7 +18,7 @@ import joblib
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from inf8239_u04.data import load_data, temporal_split  # noqa: E402
+from inf8239_u04.data import load_data, temporal_split
 
 REPORTS = ROOT / "reports"
 

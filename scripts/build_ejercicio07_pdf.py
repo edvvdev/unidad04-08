@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 import json
 import os
 import re
@@ -14,7 +15,15 @@ from reportlab.lib.enums import TA_JUSTIFY
 from reportlab.lib.pagesizes import LETTER
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
-from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import (
+    Image,
+    PageBreak,
+    Paragraph,
+    SimpleDocTemplate,
+    Spacer,
+    Table,
+    TableStyle,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS = ROOT / "reports"
@@ -29,11 +38,40 @@ riesgos = pd.read_csv(REPORTS / "lab11/risk_register_scored.csv")
 stake = pd.read_csv(REPORTS / "lab11/stakeholders.csv")
 decision = yaml.safe_load((ROOT / "student_inputs/lab12_decision.yml").read_text(encoding="utf-8"))
 impacto = yaml.safe_load((ROOT / "student_inputs/lab11_impact.yml").read_text(encoding="utf-8"))
+datos = json.loads((REPORTS / "lab13/dataset_stats.json").read_text(encoding="utf-8"))
+grupos_completos = datos["dataset"]["grupos"]
+grupos_prueba = datos["dataset"]["grupos_prueba"]
+
+
+def pct(valor: float) -> str:
+    return f"{valor * 100:.1f} %".replace(".", ",")
 
 
 def negritas(texto: str) -> str:
     return re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", texto)
 
+
+
+def celda(texto: str, estilo) -> Paragraph:
+    """Celda de tabla con ajuste de linea: el texto nunca se sale de su columna."""
+    return Paragraph(negritas(html.escape(str(texto))), estilo)
+
+
+def tabla(filas, anchos, padd=3):
+    """Tabla con celdas ajustables y rejilla uniforme."""
+    t = Table(filas, colWidths=[a * cm for a in anchos], repeatRows=1)
+    t.setStyle(TableStyle([
+        ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#94a3b8")),
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f7c7b")),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), padd),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), padd),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
+    ]))
+    return t
 
 
 def imagen_segura(ruta, ancho_cm, alto_cm):
@@ -48,6 +86,8 @@ styles.add(ParagraphStyle(name="Title2", parent=styles["Title"], fontSize=17, sp
 styles.add(ParagraphStyle(name="H1s", parent=styles["Heading1"], fontSize=12, spaceBefore=9, spaceAfter=3))
 styles.add(ParagraphStyle(name="BodyJ", parent=styles["BodyText"], alignment=TA_JUSTIFY, leading=13, fontSize=9.2))
 styles.add(ParagraphStyle(name="Small", parent=styles["BodyText"], fontSize=8.0, leading=10.2))
+styles.add(ParagraphStyle(name="Celda", parent=styles["BodyText"], fontSize=7.6, leading=9.6, spaceAfter=0))
+styles.add(ParagraphStyle(name="CeldaCab", parent=styles["BodyText"], fontSize=7.8, leading=9.8, spaceAfter=0))
 
 story = []
 story.append(Paragraph("Ejercicio 07 · Evaluación de impacto y auditoría de equidad", styles["Title2"]))
@@ -62,15 +102,18 @@ identificacion = [
     ["Caso", "Riesgo territorial SINTÉTICO (640 registros) · no representa personas ni estadísticas reales de RD"],
     ["Decisión", "LIMITAR · piloto en modo REVIEW con puerta de equidad trimestral y condiciones de retiro"],
 ]
-tabla_id = Table(identificacion, colWidths=[4.2 * cm, 11.6 * cm])
+tabla_id = Table(
+    [[celda(fila[0], styles["CeldaCab"]), celda(fila[1], styles["Celda"])] for fila in identificacion],
+    colWidths=[4.2 * cm, 13.4 * cm],
+)
 tabla_id.setStyle(TableStyle([
     ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#94a3b8")),
     ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#f1f5f9")),
     ("VALIGN", (0, 0), (-1, -1), "TOP"),
-    ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
-    ("FONTSIZE", (0, 0), (-1, -1), 8.2),
-    ("LEFTPADDING", (0, 0), (-1, -1), 5),
+    ("LEFTPADDING", (0, 0), (-1, -1), 4),
+    ("RIGHTPADDING", (0, 0), (-1, -1), 4),
     ("TOPPADDING", (0, 0), (-1, -1), 3),
+    ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
 ]))
 story.append(tabla_id)
 story.append(Spacer(1, 8))
@@ -84,18 +127,11 @@ filas = [["Interesado", "Beneficio", "Daño posible", "Poder", "Participación"]
 for _, fila in stake.iterrows():
     filas.append([fila["stakeholder"], str(fila["benefit"])[:70] + "…",
                   str(fila["harm"])[:70] + "…", fila["power"], str(fila["participation"])[:48] + "…"])
-tabla_stake = Table(filas, colWidths=[2.6 * cm, 4.2 * cm, 4.2 * cm, 1.4 * cm, 3.4 * cm], repeatRows=1)
-tabla_stake.setStyle(TableStyle([
-    ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#94a3b8")),
-    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f7c7b")),
-    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-    ("FONTSIZE", (0, 0), (-1, -1), 6.8),
-    ("VALIGN", (0, 0), (-1, -1), "TOP"),
-    ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
-    ("TOPPADDING", (0, 0), (-1, -1), 2.5),
-    ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
-]))
+tabla_stake = tabla(
+    [[celda(fila[0], styles["CeldaCab"])] + [celda(f, styles["Celda"]) for f in fila[1:]]
+     for fila in filas],
+    [3.0, 4.3, 4.3, 2.3, 3.7],
+)
 story.append(tabla_stake)
 story.append(Spacer(1, 8))
 
@@ -112,20 +148,11 @@ for _, fila in riesgos.sort_values("priority", ascending=False).iterrows():
     filas.append([fila["id"], str(fila["scenario"])[:58] + "…", str(fila["likelihood_1_4"]),
                   str(fila["impact_1_4"]), str(fila["priority"]), str(fila["control"])[:42] + "…",
                   str(fila["owner"])[:34] + "…", fila["residual"]])
-tabla_riesgos = Table(filas, colWidths=[1.0 * cm, 4.6 * cm, 0.8 * cm, 0.8 * cm, 1.5 * cm, 3.2 * cm, 3.1 * cm, 1.5 * cm],
-                      repeatRows=1)
-tabla_riesgos.setStyle(TableStyle([
-    ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#94a3b8")),
-    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f7c7b")),
-    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-    ("FONTSIZE", (0, 0), (-1, -1), 6.8),
-    ("VALIGN", (0, 0), (-1, -1), "TOP"),
-    ("ALIGN", (2, 1), (4, -1), "CENTER"),
-    ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
-    ("TOPPADDING", (0, 0), (-1, -1), 2.5),
-    ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
-]))
+tabla_riesgos = tabla(
+    [[celda(fila[0], styles["CeldaCab"])] + [celda(f, styles["Celda"]) for f in fila[1:]]
+     for fila in filas],
+    [1.1, 4.6, 0.8, 0.8, 1.5, 3.3, 3.3, 1.4],
+)
 story.append(tabla_riesgos)
 story.append(Spacer(1, 4))
 story.append(imagen_segura(REPORTS / "lab11/riesgos_priorizados.png", 13.5, 6.9))
@@ -140,24 +167,20 @@ for clave, etiqueta in [("accuracy", "Accuracy"), ("recall", "Recall (TPR)"), ("
     g1 = float(grupos_log.loc["G1", clave]) if clave in grupos_log.columns else float("nan")
     g2 = float(grupos_log.loc["G2", clave]) if clave in grupos_log.columns else float("nan")
     filas.append([etiqueta, f"{m[clave]:.4f}", f"{g1:.4f}", f"{g2:.4f}", f"{d[clave]:.4f}"])
-tabla_metricas = Table(filas, colWidths=[3.4 * cm, 2.6 * cm, 2.8 * cm, 2.8 * cm, 2.6 * cm], repeatRows=1)
-tabla_metricas.setStyle(TableStyle([
-    ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#94a3b8")),
-    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f7c7b")),
-    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-    ("FONTSIZE", (0, 0), (-1, -1), 8.0),
-    ("ALIGN", (1, 1), (-1, -1), "CENTER"),
-    ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
-    ("TOPPADDING", (0, 0), (-1, -1), 3),
-    ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
-]))
+tabla_metricas = tabla(
+    [[celda(fila[0], styles["CeldaCab"])] + [celda(f, styles["Celda"]) for f in fila[1:]]
+     for fila in filas],
+    [3.4, 2.6, 2.8, 2.8, 2.6],
+)
 story.append(tabla_metricas)
 story.append(Spacer(1, 4))
 story.append(Paragraph(
-    "Tasa base de positivos en la prueba: G1 23,9 % frente a G2 72,9 % (datos completos: 49,6 % y "
-    "63,9 %). La diferencia de recall refleja en parte esa prevalencia distinta, no una decisión "
-    "discriminatoria demostrada: el atributo sensible no entra al modelo.", styles["Small"]))
+    "Tasa base de positivos en la prueba: G1 "
+    f"{pct(grupos_prueba['G1']['tasa'])} frente a G2 {pct(grupos_prueba['G2']['tasa'])} (datos "
+    f"completos: {pct(grupos_completos['G1']['tasa'])} y {pct(grupos_completos['G2']['tasa'])}). "
+    "La diferencia de recall refleja en parte esa prevalencia distinta, no una decisión "
+    "discriminatoria demostrada: el atributo sensible no entra al modelo. Fuente: "
+    "reports/lab13/dataset_stats.json.", styles["Small"]))
 story.append(Spacer(1, 4))
 story.append(imagen_segura(REPORTS / "lab12/metricas_por_grupo.png", 15.5, 5.7))
 story.append(Spacer(1, 4))
@@ -168,18 +191,11 @@ for etiqueta, fila in inter.iterrows():
     n = int(fila["count"])
     filas.append([etiqueta, str(n), f"{fila['recall']:.4f}", f"{fila['fpr']:.4f}",
                   "INSUFICIENTE" if n < 15 else "aceptable"])
-tabla_inter = Table(filas, colWidths=[3.4 * cm, 1.6 * cm, 2.4 * cm, 2.4 * cm, 3.0 * cm], repeatRows=1)
-tabla_inter.setStyle(TableStyle([
-    ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#94a3b8")),
-    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f7c7b")),
-    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-    ("FONTSIZE", (0, 0), (-1, -1), 7.6),
-    ("ALIGN", (1, 1), (3, -1), "CENTER"),
-    ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
-    ("TOPPADDING", (0, 0), (-1, -1), 2.5),
-    ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
-]))
+tabla_inter = tabla(
+    [[celda(fila[0], styles["CeldaCab"])] + [celda(f, styles["Celda"]) for f in fila[1:]]
+     for fila in filas],
+    [3.4, 1.6, 2.4, 2.4, 3.0],
+)
 story.append(tabla_inter)
 story.append(Spacer(1, 4))
 story.append(imagen_segura(REPORTS / "lab12/recall_interseccional.png", 15.5, 7.75))
@@ -193,19 +209,11 @@ for nombre, datos, grupos in [("Logística", logistic, grupos_log), ("Árbol", t
                   f"{datos['differences']['fpr']:.4f}",
                   f"{datos['resources']['training_seconds']:.4f}",
                   f"{datos['resources']['model_kb']:.2f}"])
-tabla_alt = Table(filas, colWidths=[2.6 * cm, 2.0 * cm, 1.9 * cm, 1.8 * cm, 2.2 * cm, 2.1 * cm, 2.1 * cm, 2.3 * cm],
-                   repeatRows=1)
-tabla_alt.setStyle(TableStyle([
-    ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#94a3b8")),
-    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f7c7b")),
-    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-    ("FONTSIZE", (0, 0), (-1, -1), 7.8),
-    ("ALIGN", (1, 1), (-1, -1), "CENTER"),
-    ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
-    ("TOPPADDING", (0, 0), (-1, -1), 3),
-    ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
-]))
+tabla_alt = tabla(
+    [[celda(fila[0], styles["CeldaCab"])] + [celda(f, styles["Celda"]) for f in fila[1:]]
+     for fila in filas],
+    [2.6, 2.0, 1.9, 1.8, 2.2, 2.1, 2.1, 2.3],
+)
 story.append(tabla_alt)
 story.append(Spacer(1, 4))
 story.append(imagen_segura(REPORTS / "lab12/utilidad_vs_brecha.png", 13.5, 7.3))

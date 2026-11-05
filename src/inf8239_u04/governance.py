@@ -1,6 +1,7 @@
 from pathlib import Path
-import pandas as pd
+
 import yaml
+
 
 def load_config(path="configs/governance.yml"):
     return yaml.safe_load(Path(path).read_text(encoding="utf-8"))

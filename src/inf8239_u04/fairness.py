@@ -1,5 +1,11 @@
 import pandas as pd
-from fairlearn.metrics import MetricFrame, count, false_positive_rate, selection_rate, true_positive_rate
+from fairlearn.metrics import (
+    MetricFrame,
+    count,
+    false_positive_rate,
+    selection_rate,
+    true_positive_rate,
+)
 from sklearn.metrics import accuracy_score, precision_score
 
 METRICS={"count":count,"accuracy":accuracy_score,"selection_rate":selection_rate,"recall":true_positive_rate,"precision":lambda y,p:precision_score(y,p,zero_division=0),"fpr":false_positive_rate}

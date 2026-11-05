@@ -33,6 +33,7 @@ if [ "$OBJETIVO" = "ej07" ] || [ "$OBJETIVO" = "todo" ]; then
   uv run python scripts/lab12_audit.py --model logistic
   uv run python scripts/lab12_audit.py --model tree
   uv run python scripts/validate_lab12_decision.py
+  uv run python scripts/dataset_stats.py
   uv run pytest -q tests/test_impact.py tests/test_privacy.py tests/test_fairness.py tests/test_model.py
 
   if [ "${SKIP_NOTEBOOK:-0}" != "1" ]; then
@@ -50,14 +51,17 @@ fi
 if [ "$OBJETIVO" = "ej08" ] || [ "$OBJETIVO" = "todo" ]; then
   echo "==> 4/5. LAB13 (gobernanza, runbook y simulacro)"
   # LAB13 se apoya en la evidencia de LAB11-12: si no existe, se genera antes.
-  if [ ! -f "reports/lab12/logistic/global_metrics.json" ]; then
+  if [ ! -f "reports/lab12/logistic/global_metrics.json" ] || [ ! -f "reports/lab13/dataset_stats.json" ]; then
     echo "    No hay evidencia de LAB12: se genera ahora"
     uv run python scripts/lab11_impact.py
     uv run python scripts/lab12_audit.py --model logistic
     uv run python scripts/lab12_audit.py --model tree
     uv run python scripts/validate_lab12_decision.py
+    uv run python scripts/dataset_stats.py
   fi
   uv run python scripts/lab13_governance.py
+  uv run python scripts/dataset_stats.py
+  uv run python scripts/model_facts.py
   uv run python scripts/simulate_incident.py
 
   if [ "${SKIP_NOTEBOOK:-0}" != "1" ]; then
@@ -68,6 +72,7 @@ if [ "$OBJETIVO" = "ej08" ] || [ "$OBJETIVO" = "todo" ]; then
     echo "    OMITIDO por SKIP_NOTEBOOK=1"
   fi
   uv run python scripts/make_figures.py
+  uv run python scripts/build_model_card.py
   REPO_URL="${REPO_URL_E08:-https://github.com/edvvdev/unidad04-08}" \
     uv run python scripts/build_ejercicio08_pdf.py
 fi
@@ -89,6 +94,11 @@ for etiqueta, archivo in [
 decision = json.loads((reports / "lab13/deployment_decision.json").read_text(encoding="utf-8"))
 print("  Decision del pipeline:", decision["decision"]["status"], "| puertas fallidas:",
       ", ".join(decision["decision"]["failed"]))
+stats = json.loads((reports / "lab13/dataset_stats.json").read_text(encoding="utf-8"))
+soporte = stats["soporte_interseccional"]
+print("  Celdas con soporte insuficiente:", soporte["conteo_insuficientes"],
+      "| celdas interseccionales:", soporte["total_celdas"],
+      "| umbral:", soporte["umbral_minimo"])
 print("  Revisa que las cifras coincidan con README, Model Card, RUNBOOK y PDF.")
 CODE
 

@@ -6,8 +6,8 @@ contenido refleja el drill ejecutado sobre el caso sintetico: la puerta de equid
 y el sistema debe degradar a REVIEW, no ocultarse.
 """
 
-from datetime import datetime, timezone
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
@@ -30,7 +30,7 @@ puertas_fallidas = ", ".join(decision["decision"]["failed"])
 
 text = (
     "# Postmortem de incidente simulado\n\n"
-    f"- detected_at: {datetime.now(timezone.utc).isoformat()}\n"
+    f"- detected_at: {datetime.now(UTC).isoformat()}\n"
     "- signal: recall gap exceeded\n"
     f"- signal_detail: la brecha de recall entre grupos ({brechas['recall_gap']:.4f}) supera la "
     f"tolerancia de piloto acordada en el LAB12 ({gates['max_recall_gap_pilot']:.2f}); ademas el recall "

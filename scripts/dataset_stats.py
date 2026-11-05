@@ -21,7 +21,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from inf8239_u04.data import load_data, temporal_split  # noqa: E402
+from inf8239_u04.data import load_data, temporal_split
 
 REPORTS = ROOT / "reports"
 CFG = yaml.safe_load((ROOT / "configs/governance.yml").read_text(encoding="utf-8"))
@@ -49,7 +49,7 @@ def tasas_por_grupo(frame: pd.DataFrame) -> dict:
     salida = {}
     for grupo, bloque in frame.groupby("protected_group"):
         positivos = int(bloque["target"].sum())
-        total = int(len(bloque))
+        total = len(bloque)
         salida[str(grupo)] = {
             "n": total,
             "positivos": positivos,
@@ -92,13 +92,13 @@ def calcular() -> dict:
     return {
         "dataset": {
             "ruta": "data/territorial_risk_synthetic.csv",
-            "filas": int(len(df)),
-            "columnas": int(len(df.columns)),
+            "filas": len(df),
+            "columnas": len(df.columns),
             "corte_temporal": {
                 "entrenamiento_hasta": str(train["received_date"].max().date()),
                 "prueba_desde": str(test["received_date"].min().date()),
-                "filas_entrenamiento": int(len(train)),
-                "filas_prueba": int(len(test)),
+                "filas_entrenamiento": len(train),
+                "filas_prueba": len(test),
             },
             "objetivo": {
                 "positivos": int(df["target"].sum()),

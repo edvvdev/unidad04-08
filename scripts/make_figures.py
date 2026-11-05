@@ -13,9 +13,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import yaml
+from matplotlib.patches import Patch
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS = ROOT / "reports"
+
+# Colores del inventario: verde azulado = variable del modelo; gris azulado = fuera del modelo.
+COLOR_VARIABLE = "#0f7c7b"
+COLOR_NO_VARIABLE = "#94a3b8"
 
 
 def figura_riesgos() -> None:
@@ -94,12 +99,23 @@ def figura_inventario() -> None:
     cfg = yaml.safe_load((ROOT / "configs/governance.yml").read_text(encoding="utf-8"))
     inventario = pd.DataFrame(cfg["inventory"])
     figura, eje = plt.subplots(figsize=(9, 4.4))
-    colores = ["#0f7c7b" if u else "#94a3b8" for u in inventario["used_as_feature"]]
+    colores = [COLOR_VARIABLE if u else COLOR_NO_VARIABLE for u in inventario["used_as_feature"]]
     eje.barh(inventario["name"], inventario["retention_days"], color=colores)
     for y, (d, u) in enumerate(zip(inventario["retention_days"], inventario["used_as_feature"])):
         eje.text(d + 8, y, f"{d} d" + (" · variable" if u else " · fuera del modelo"), va="center", fontsize=8)
     eje.set_xlabel("Retención (días)")
-    eje.set_title("Inventario: retención y uso como variable · azul = entra al modelo")
+    eje.set_title("Inventario: retención y uso como variable")
+    eje.legend(
+        handles=[
+            Patch(color=COLOR_VARIABLE, label="Entra al modelo (variable)"),
+            Patch(color=COLOR_NO_VARIABLE, label="Fuera del modelo (no variable)"),
+        ],
+        fontsize=8,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.14),
+        ncol=2,
+        frameon=False,
+    )
     eje.set_xlim(0, 1250)
     eje.invert_yaxis()
     eje.grid(axis="x", alpha=0.3)
@@ -156,7 +172,7 @@ def main() -> None:
         try:
             funcion()
             print("OK   ", nombre)
-        except Exception as error:  # la figura depende de artefactos que pueden no existir
+        except Exception as error:  # noqa: BLE001 - la figura depende de artefactos que pueden faltar
             print("FALTA", nombre, "->", type(error).__name__, error)
 
 
