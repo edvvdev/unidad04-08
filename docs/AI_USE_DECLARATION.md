@@ -87,7 +87,7 @@ referencia, cifra o evidencia fue inventada: todas provienen de `reports/lab11/`
       en la prueba), ni los dos fragmentos en inglés que se corrigieron en el postmortem y el runbook.
 - [x] `pdftoppm -png -r 100 -f 2 -l 2 docs/EJERCICIO_08_PDF_SINTESIS.pdf` → página 2 revisada: la
       tabla de la sección 2 ya no tiene texto solapado.
-- [x] `git tag u04-lab13` → etiqueta ya existente sobre el commit de cierre.
+- [x] `git tag u04-lab13` → etiqueta ya publicada (apunta al commit de entrega inicial `8a97a3e`); las correcciones de la auditoría quedan en los commits posteriores y en la etiqueta `u04-lab13-auditoria`.
 
 **Correcciones realizadas**
 
