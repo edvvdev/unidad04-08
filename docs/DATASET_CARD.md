@@ -14,8 +14,8 @@ practicar contratos de datos, evaluación temporal, auditoría de subgrupos y go
 |---|---|
 | Origen | Generado sintéticamente por el profesor como parte del proyecto base (no es un dataset público) |
 | Semilla | Fija y documentada por el profesor en el proyecto base |
-| Fecha de recepción | 2026-11-02 (`~/Downloads/INF8239_U04_Gobernanza_DSS_Proyecto_Base_uv.zip`) |
-| Ruta local | `data/territorial_risk_synthetic.csv` (versionado: es sintético y no contiene datos personales) |
+| Fecha de recepción | 2026-11-02 (material base `INF8239_U04_Gobernanza_DSS_Proyecto_Base_uv`, distribuido por el profesor) |
+| Ruta en el repositorio | `data/territorial_risk_synthetic.csv` (versionado: es sintético y no contiene datos personales) |
 | Filas × columnas | 640 × 9 |
 | Periodo | 2026-01-01 a 2026-12-27 (fechas sintéticas) |
 
@@ -45,8 +45,15 @@ directa es rechazada antes de predecir (`src/inf8239_u04/data.py::validate_schem
 | Grupos | G1 396 · G2 244 |
 | Bandas de edad | 18-29: 148 · 30-44: 163 · 45-59: 150 · 60+: 179 |
 | Zonas | Norte 155 · Oeste 157 · Sur 164 · Este 164 |
-| Tasa de positivos por grupo (datos completos) | G1 49,6 % · **G2 63,9 %** |
-| Tasa de positivos por grupo (prueba, 160 casos) | G1 23,9 % · **G2 72,9 %** |
+
+**Tasa de positivos por grupo** (calculada desde los datos por `scripts/dataset_stats.py`):
+
+<!-- stats:inicio rates -->
+| Corte | G1 | G2 |
+|---|---|---|
+| Datos completos (640 registros) | 49,7 % | 63,9 % |
+| Prueba temporal (160 registros) | 48,5 % | 72,9 % |
+<!-- stats:fin rates -->
 
 La diferencia de prevalencia entre grupos es **el hecho central de la auditoría**: una brecha de recall
 puede reflejar la distinta prevalencia del target y no una decisión discriminatoria del modelo.
@@ -58,9 +65,12 @@ El corte es **2026-09-24 / 2026-09-25**: entrenamiento 480 casos (hasta el 24 de
 
 ## Soporte mínimo en las celdas interseccionales
 
-En la prueba, las ocho celdas `grupo | banda de edad` tienen entre **8 y 35 observaciones**. Las
-cifras de `G2 | 45-59` (n=8) y `G2 | 18-29` (n=11) tienen soporte **insuficiente** y no deben
-interpretarse como evidencia de brecha.
+<!-- stats:inicio soporte -->
+En la prueba, las ocho celdas `grupo | banda de edad` tienen entre **8 y 35 observaciones**.
+Las cifras de `G2 | 45-59` (n=8), `G2 | 18-29` (n=11), `G2 | 30-44` (n=14) tienen soporte
+**insuficiente** (umbral mínimo: 15 observaciones) y no deben interpretarse como evidencia
+de brecha.
+<!-- stats:fin soporte -->
 
 ## Sesgos, población no cubierta y usos prohibidos
 

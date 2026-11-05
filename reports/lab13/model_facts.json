@@ -1,0 +1,23 @@
+{
+  "logistic": {
+    "training_seconds": 0.019056299999647308,
+    "latency_ms": 0.01604986875349823,
+    "model_kb": 3.5634765625,
+    "parametros": 12,
+    "detalle_parametros": "11 coeficientes + 1 intercepto",
+    "artefacto": "models/logistic.joblib"
+  },
+  "tree": {
+    "training_seconds": 0.012833418999889545,
+    "model_kb": 7.9013671875,
+    "parametros": 51,
+    "detalle_parametros": "nodos del árbol",
+    "artefacto": "models/tree.joblib"
+  },
+  "fuente": [
+    "reports/lab13/deployment_decision.json",
+    "reports/lab12/tree/global_metrics.json",
+    "models/logistic.joblib",
+    "models/tree.joblib"
+  ]
+}

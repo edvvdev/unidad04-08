@@ -23,6 +23,12 @@ gates:
   max_recall_gap_pilot: 0.10          # brecha de recall tolerada en modo piloto (LAB12)
   min_intersectional_support: 15      # observaciones mínimas para interpretar una celda (LAB12)
 
+# Escalamiento a STOP: umbrales de retirada al baseline sin modelo de la decision documentada
+# LIMITAR (coherentes con la tolerancia y las condiciones de retiro acordadas en el LAB12).
+escalation:
+  stop_if_recall_gap_above: 0.15
+  stop_if_worst_group_recall_below: 0.60
+
 # Inventario, minimizacion y retencion (criterio 1 del Ejercicio 08).
 inventory:
   - name: case_id

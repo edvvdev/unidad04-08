@@ -56,8 +56,16 @@ repositorio.
 ```bash
 uv run python scripts/lab13_governance.py      # pipeline gobernado -> reports/lab13/
 uv run python scripts/simulate_incident.py     # simulacro -> reports/lab13/INCIDENT_POSTMORTEM.md
+uv run python scripts/dataset_stats.py         # tasas por grupo y soporte -> reports/lab13/dataset_stats.json
+uv run python scripts/model_facts.py           # evidencia Green AI -> reports/lab13/model_facts.json
+uv run python scripts/build_model_card.py      # docs/MODEL_CARD.md generado desde reports/
 uv run streamlit run app.py                    # tablero con propósito, límites, puertas y acción humana
 ```
+
+Las cifras de este README, de la Model Card y de los PDF **no están escritas a mano**: las calcula
+`scripts/dataset_stats.py` (tasas por grupo y soporte interseccional), `scripts/model_facts.py`
+(evidencia Green AI) y `scripts/build_model_card.py` (Model Card), siempre desde `reports/` y
+`configs/governance.yml`.
 
 **Decisión del pipeline: REVIEW.** Con los umbrales por defecto del proyecto base (brecha de recall
 ≤ 0,16) sería GO; con la tolerancia acordada en el LAB12 (brecha ≤ 0,10 y recall del peor grupo
@@ -101,8 +109,18 @@ de retiro en el runbook).
 | FPR | 0,2794 | 0,250 | 0,375 | 0,1250 |
 | Tasa de selección | 0,5313 | 0,446 | 0,678 | 0,2324 |
 
+**Tasa base de positivos por grupo** (calculada desde los datos por `scripts/dataset_stats.py`):
+
+<!-- stats:inicio rates -->
+| Corte | G1 | G2 |
+|---|---|---|
+| Datos completos (640 registros) | 49,7 % | 63,9 % |
+| Prueba temporal (160 registros) | 48,5 % | 72,9 % |
+<!-- stats:fin rates -->
+
 Soporte interseccional: ocho celdas con n entre 8 y 35; **soporte insuficiente** en `G2 | 45-59`
-(n=8) y `G2 | 18-29` (n=11), cuyas cifras no se interpretan como evidencia de brecha.
+(n=8), `G2 | 30-44` (n=14) y `G2 | 18-29` (n=11), cuyas cifras no se interpretan como evidencia de
+brecha.
 
 **Comparación de alternativas**: la logística y el árbol obtienen la **misma utilidad global**
 (recall 0,7174), pero la logística tiene **brechas menores** (recall 0,1376 frente a 0,1813; FPR
@@ -113,10 +131,14 @@ Soporte interseccional: ocho celdas con n entre 8 y 35; **soporte insuficiente**
 No desplegar de forma autónoma ni usar el ranking como orden de ejecución. Piloto en modo **REVIEW**
 con revisión humana obligatoria, la logística como única configuración y una puerta de equidad
 trimestral: si la brecha de recall supera 0,15 o el recall del peor grupo baja de 0,60, la salida pasa
-a **STOP** y el sistema se retira. La brecha observada **no prueba discriminación causal** (el
-atributo sensible no entra al modelo y parte de la diferencia es la tasa base de positivos: G2 63,9 %
-frente a G1 49,6 %), pero tampoco puede descartarse: zona y banda de edad pueden portar el mismo
-sesgo de forma indirecta.
+a **STOP** y el sistema se retira.
+
+<!-- stats:inicio rates_decision -->
+La brecha observada **no prueba discriminación causal** (el atributo sensible no entra al
+modelo y parte de la diferencia es la tasa base de positivos: G1 49,7 % frente a G2 63,9 %
+en los datos completos), pero tampoco puede descartarse: zona y banda de edad pueden portar
+el mismo sesgo de forma indirecta.
+<!-- stats:fin rates_decision -->
 
 ## Capas que no se confunden
 

@@ -1,0 +1,130 @@
+{
+  "dataset": {
+    "ruta": "data/territorial_risk_synthetic.csv",
+    "filas": 640,
+    "columnas": 9,
+    "corte_temporal": {
+      "entrenamiento_hasta": "2026-09-24",
+      "prueba_desde": "2026-09-25",
+      "filas_entrenamiento": 480,
+      "filas_prueba": 160
+    },
+    "objetivo": {
+      "positivos": 353,
+      "negativos": 287,
+      "tasa_positivos": 0.5515625
+    },
+    "grupos": {
+      "G1": {
+        "n": 396,
+        "positivos": 197,
+        "tasa": 0.49747474747474746
+      },
+      "G2": {
+        "n": 244,
+        "positivos": 156,
+        "tasa": 0.639344262295082
+      }
+    },
+    "grupos_prueba": {
+      "G1": {
+        "n": 101,
+        "positivos": 49,
+        "tasa": 0.48514851485148514
+      },
+      "G2": {
+        "n": 59,
+        "positivos": 43,
+        "tasa": 0.7288135593220338
+      }
+    }
+  },
+  "soporte_interseccional": {
+    "umbral_minimo": 15,
+    "total_celdas": 8,
+    "celdas": [
+      {
+        "celda": "G1 | 18-29",
+        "n": 18,
+        "recall": 0.75,
+        "fpr": 0.1428571428571428,
+        "soporte": "aceptable"
+      },
+      {
+        "celda": "G1 | 30-44",
+        "n": 24,
+        "recall": 0.5625,
+        "fpr": 0.125,
+        "soporte": "aceptable"
+      },
+      {
+        "celda": "G1 | 45-59",
+        "n": 35,
+        "recall": 0.5882352941176471,
+        "fpr": 0.3888888888888889,
+        "soporte": "aceptable"
+      },
+      {
+        "celda": "G1 | 60+",
+        "n": 24,
+        "recall": 0.8333333333333334,
+        "fpr": 0.25,
+        "soporte": "aceptable"
+      },
+      {
+        "celda": "G2 | 18-29",
+        "n": 11,
+        "recall": 0.875,
+        "fpr": 0.0,
+        "soporte": "insuficiente"
+      },
+      {
+        "celda": "G2 | 30-44",
+        "n": 14,
+        "recall": 0.6666666666666666,
+        "fpr": 0.5,
+        "soporte": "insuficiente"
+      },
+      {
+        "celda": "G2 | 45-59",
+        "n": 8,
+        "recall": 1.0,
+        "fpr": 0.0,
+        "soporte": "insuficiente"
+      },
+      {
+        "celda": "G2 | 60+",
+        "n": 26,
+        "recall": 0.7647058823529411,
+        "fpr": 0.5555555555555556,
+        "soporte": "aceptable"
+      }
+    ],
+    "insuficientes": [
+      {
+        "celda": "G2 | 45-59",
+        "n": 8,
+        "recall": 1.0,
+        "fpr": 0.0,
+        "soporte": "insuficiente"
+      },
+      {
+        "celda": "G2 | 18-29",
+        "n": 11,
+        "recall": 0.875,
+        "fpr": 0.0,
+        "soporte": "insuficiente"
+      },
+      {
+        "celda": "G2 | 30-44",
+        "n": 14,
+        "recall": 0.6666666666666666,
+        "fpr": 0.5,
+        "soporte": "insuficiente"
+      }
+    ],
+    "conteo_insuficientes": 3,
+    "n_minimo": 8,
+    "n_maximo": 35
+  }
+}
