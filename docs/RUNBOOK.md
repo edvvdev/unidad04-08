@@ -13,16 +13,19 @@ vigila la **deriva**: comparación de la distribución de la zona, la banda de e
 reportes frente a la referencia del corte temporal 2026-09-24/25.
 
 **Cómo se detecta.** El pipeline gobernado (`scripts/lab13_governance.py`) escribe
-`reports/lab13/deployment_decision.json` en cada ejecución; si alguna puerta falla, el estado pasa de
-GO a **REVIEW** y se genera la alerta. En el simulacro, la señal fue la brecha de recall (0,1376)
-por encima de la tolerancia de piloto (0,10).
+`reports/lab13/deployment_decision.json` en cada ejecución; si alguna puerta falla, el estado que
+devuelve el evaluador deja de ser **GO** (todas las puertas en verde) y pasa a **REVIEW**, y se genera
+la alerta. GO y REVIEW son *estados del evaluador*, no decisiones: la decisión documentada es
+**LIMITAR** y la toma una persona. En el simulacro, la señal fue la brecha de recall (0,1376) por
+encima de la tolerancia de piloto (0,10), con el recall de G1 (0,6531) bajo el mínimo de 0,70 y tres
+celdas interseccionales con soporte insuficiente (n=8, n=11 y n=14; umbral 15).
 
 **Clasificación de severidad.**
 
 | Severidad | Criterio | Acción inmediata |
 |---|---|---|
 | Baja | Una puerta de desempeño falla; no hay acción sobre personas | Corrección técnica y nota en la revisión |
-| Media | Una puerta de equidad falla, o el soporte interseccional es insuficiente | **REVIEW**: se congela la priorización automática y se vuelve al baseline sin modelo |
+| Media | Una puerta de equidad falla, o el soporte interseccional es insuficiente (3 celdas: n=8, n=11 y n=14) | **REVIEW**: se congela la priorización automática y se vuelve al baseline sin modelo |
 | Alta | Acción sobre personas sin revisión humana, uso fuera de alcance o fuga de datos | **STOP**: retiro inmediato, contención y notificación a Legal |
 
 ## 2. Autoridad de contención
@@ -51,8 +54,9 @@ formal; la retención de logs y reportes es de 365 días y la de modelos de 730 
 - **A las personas afectadas (≤ 72 h):** por el canal de apelaciones, indicando de forma clara que
   el sistema **no decide** y que toda acción sobre una persona la revisó una persona responsable.
   No se comparten identificadores ni datos personales en la comunicación.
-- **Mensaje prohibited:** no afirmar que el sistema "detecta"-who "identifica" a personas ni que una
-  persona está en riesgo por pertenecer a un grupo.
+- **Mensaje prohibido:** no afirmar que el sistema «detecta» o «identifica» a personas, ni que una
+  persona está en riesgo por pertenecer a un grupo. El sistema ordena una cola de revisión; la
+  decisión sobre una persona la revisa y documenta una persona responsable.
 
 ## 5. Rollback o baseline seguro
 
@@ -65,6 +69,12 @@ camino que no depende del modelo.
 verde **antes** de reactivar la priorización automática; si la brecha sigue fuera de tolerancia, el
 sistema permanece en REVIEW con decisión humana documentada.
 
+**Escalamiento a STOP (retirada al baseline sin modelo).** Los umbrales están en
+`configs/governance.yml → escalation`: si la brecha de recall supera 0,15 o el recall del peor grupo
+baja de 0,60, el sistema se retira al baseline sin modelo y se documenta la decisión. Es una decisión
+humana con evidencia (auditoría trimestral y revisión del incidente), no un estado que el evaluador
+devuelva por sí solo.
+
 ## 6. Postmortem, responsable y fecha
 
 | Campo | Contenido |
@@ -75,7 +85,7 @@ sistema permanece en REVIEW con decisión humana documentada.
 | Fecha límite de acciones correctivas | 2026-12-15 (auditoría con periodo posterior e intervalos de confianza) |
 | Entrada de learnings | Revisión trimestral; las acciones correctivas se verifican en la siguiente revisión |
 
-**Lecciones del simulacro:** con los umbrales por defecto del proyecto base (brecha ≤ 0,16) la
-decisión habría sido GO; la tolerancia acordada en el LAB12 es más estricta y es la que debe gobernar
-el sistema. Además, el simulacro mostró que el tablero debe mostrar **el estado REVIEW y las puertas
+**Lecciones del simulacro:** con los umbrales por defecto del proyecto base (brecha ≤ 0,16) el estado
+del evaluador habría sido GO; la tolerancia acordada en el LAB12 es más estricta y es la que debe
+gobernar el sistema. Además, el simulacro mostró que el tablero debe mostrar **el estado REVIEW y las puertas
 fallidas** de forma visible, no solo el resumen de métricas.

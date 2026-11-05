@@ -1,8 +1,8 @@
 # Postmortem de incidente simulado
 
-- detected_at: 2026-11-02T12:42:01.013756+00:00
+- detected_at: 2026-11-05T23:10:15.424442+00:00
 - signal: recall gap exceeded
-- signal_detail: la brecha de recall entre grupos (0.1376) supera la tolerancia de piloto acordada en el LAB12 (0.10); ademas el recall del grupo con peor desempeño (G1: 0.653) queda por debajo del minimo de 0.70 y hay dos celdas interseccionales con soporte insuficiente (n=8 y n=11)
+- signal_detail: la brecha de recall entre grupos (0.1376) supera la tolerancia de piloto acordada en el LAB12 (0.10); ademas el recall del grupo con peor desempeño (G1: 0.6531) queda por debajo del minimo de 0.70 y hay 3 celdas interseccionales con soporte insuficiente (G2 | 45-59 (n=8), G2 | 18-29 (n=11), G2 | 30-44 (n=14); umbral 15 observaciones)
 - detection: comparacion mensual de las metricas contra los umbrales de configs/governance.yml (monitoring.alert_thresholds), con la puerta de equidad como disparador principal
 - severity: media (el sistema no decide de forma autonoma y no se han producido acciones sobre personas; el riesgo es de calidad de la priorizacion)
 - containment: la decision del pipeline pasa a REVIEW y se congela el despliegue; la cola deja de ordenar automaticamente y el equipo vuelve al baseline sin modelo (prioridad por severidad reportada) con revision humana de cada caso
@@ -12,4 +12,4 @@
 - rollback: retorno a la version anterior del modelo o al baseline sin modelo, con verificacion de las puertas de desempeño y equidad antes de reactivar
 - postmortem_owner: ML Engineer
 - corrective_actions: (1) repetir la auditoria con un periodo posterior y con intervalos de confianza, owner Data Scientist, fecha 2026-12-15; (2) cuantificar el coste real de un falso negativo para fijar la tolerancia con evidencia, owner Product Owner, fecha 2026-12-01; (3) ampliar el soporte de las celdas interseccionales o retirar esas metricas del tablero, owner Responsible for Equity, fecha 2026-12-01; (4) incorporar la puerta de equidad al tablero con el estado REVIEW visible, owner ML Engineer, fecha 2026-11-30
-- lessons: las puertas por defecto del proyecto base (brecha <= 0.16) habrian dado GO; la tolerancia acordada en el LAB12 es mas estricta y es la que debe governs el sistema
+- lessons: las puertas por defecto del proyecto base (brecha <= 0.16) habrian dado GO; la tolerancia acordada en el LAB12 es mas estricta y es la que debe gobernar el sistema. Las tres puertas fallidas (worst_group_recall, recall_gap_pilot, intersectional_support) no se ocultan: degradan el estado a REVIEW y obligan a una decision humana documentada. Si la brecha de recall supera 0.15 o el recall del peor grupo baja de 0.60, el sistema se retira al baseline sin modelo (escalamiento a STOP documentado)
