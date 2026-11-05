@@ -1,6 +1,6 @@
-# Declaración de uso de IA · Unidad 04 (LAB11–LAB12 · Ejercicio 07)
+# Declaración de uso de IA · Unidad 04 (LAB11–LAB13 · Ejercicios 07 y 08)
 
-Proyecto: `INF8239_U04_Gobernanza_DSS` · Fecha: 2026-11-02
+Proyecto: `INF8239_U04_Gobernanza_DSS` · Fecha: 2026-11-02 · Revisión: 2026-11-05 (Ejercicio 08)
 
 ## Herramienta
 
@@ -21,7 +21,8 @@ es el caso sintético que acompaña al proyecto base.
 **Lo que la IA no hizo (y no puede hacer por mandato):** los **valores del análisis** —finalidad,
 interesados, probabilidad e impacto de cada riesgo, tolerancia de brecha, métrica principal y
 recomendación— los decidió el estudiante con la evidencia del manual y de las ejecuciones; y ninguna
-referencia, cifra o evidencia fue inventada: todas provienen de `reports/lab11/` y `reports/lab12/`.
+referencia, cifra o evidencia fue inventada: todas provienen de `reports/lab11/`, `reports/lab12/` y
+`reports/lab13/`, y de los umbrales declarados en `configs/governance.yml`.
 
 ## Prompts relevantes
 
@@ -55,16 +56,38 @@ referencia, cifra o evidencia fue inventada: todas provienen de `reports/lab11/`
 5. «Distingue obligación legal, marco voluntario y recomendación ética, y explica la decisión final:
    desplegar, modificar, limitar o no utilizar.»
 
-**Verificaciones que el estudiante debe repetir**
+**Verificaciones ejecutadas** (comando y salida real; el flujo completo se repite con
+`bash scripts/run_all.sh`)
 
-- [ ] `uv sync --frozen && uv run pytest -q` → 10 passed (incluye la prueba de la app sin navegador).
-- [ ] `uv run python scripts/lab13_governance.py` → `reports/lab13/deployment_decision.json` con
-      `status: REVIEW` y las tres puertas fallidas.
-- [ ] `uv run python scripts/simulate_incident.py` → `reports/lab13/INCIDENT_POSTMORTEM.md` con
+- [x] `uv sync --frozen && uv run pytest -q` → `10 passed in 1.52s` (incluye la prueba de la app sin
+      navegador).
+- [x] `uv run ruff check .` → `All checks passed!`
+- [x] `bash scripts/run_all.sh` (modo por defecto: Ejercicio 07 + Ejercicio 08) → flujo completo sin
+      errores; al final: `Decision del pipeline: REVIEW | puertas fallidas: worst_group_recall,
+      recall_gap_pilot, intersectional_support` y `Celdas con soporte insuficiente: 3 | celdas
+      interseccionales: 8 | umbral: 15`.
+- [x] `uv run python scripts/lab13_governance.py` → `{'status': 'REVIEW', 'checks': {'recall': True,
+      'recall_gap': True, 'fpr_gap': True, 'latency': True, 'model_size': True,
+      'worst_group_recall': False, 'recall_gap_pilot': False, 'intersectional_support': False},
+      'failed': ['worst_group_recall', 'recall_gap_pilot', 'intersectional_support']}` en
+      `reports/lab13/deployment_decision.json`.
+- [x] `uv run python scripts/simulate_incident.py` → `reports/lab13/INCIDENT_POSTMORTEM.md` con
       comunicación, rollback y acciones correctivas con responsables y fechas.
-- [ ] `uv run streamlit run app.py` → el tablero muestra estado REVIEW, las puertas fallidas, el
-      inventario, la retención y la acción humana.
-- [ ] `git tag u04-lab13` sobre el commit de cierre.
+- [x] `uv run python scripts/dataset_stats.py` → `reports/lab13/dataset_stats.json` y actualización de
+      los bloques de cifras de `README.md` y `docs/DATASET_CARD.md`.
+- [x] `uv run python scripts/model_facts.py` → `reports/lab13/model_facts.json`
+      (`logistica: 12 parámetros · 3.56 KB · 0.0172 ms/registro`; `arbol: 51 parámetros · 7.9 KB`).
+- [x] `uv run python scripts/build_model_card.py` → `docs/MODEL_CARD.md` regenerado desde `reports/`:
+      sin marcadores de plantilla pendientes.
+- [x] `uv run streamlit run app.py` → el tablero arranca (`GET /_stcore/health` → `200 ok`) y expone
+      estado REVIEW, las puertas fallidas, el inventario, la retención y la acción humana.
+- [x] `pdftotext -layout docs/EJERCICIO_08_PDF_SINTESIS.pdf -` → contiene «Edwing Perez», la URL del
+      repositorio, LIMITAR, REVIEW, STOP y las tasas 48,5 % / 72,9 % / 49,7 % / 63,9 %; no contiene
+      ninguna de las dos tasas que estaban mal calculadas (la de G1 en los datos completos y la de G1
+      en la prueba), ni los dos fragmentos en inglés que se corrigieron en el postmortem y el runbook.
+- [x] `pdftoppm -png -r 100 -f 2 -l 2 docs/EJERCICIO_08_PDF_SINTESIS.pdf` → página 2 revisada: la
+      tabla de la sección 2 ya no tiene texto solapado.
+- [x] `git tag u04-lab13` → etiqueta ya existente sobre el commit de cierre.
 
 **Correcciones realizadas**
 
@@ -72,19 +95,28 @@ referencia, cifra o evidencia fue inventada: todas provienen de `reports/lab11/`
 |---|---|---|
 | Puertas de equidad derivadas del LAB12 añadidas a la configuración y al evaluador | Con los umbrales por defecto el sistema daba GO y la decisión documentada era LIMITAR | La decisión del pipeline es REVIEW con tres puertas fallidas |
 | `app.py` muestra puertas fallidas, inventario y retención | El tablero base solo mostraba propósito, métricas y resumen de puertas | La prueba `tests/test_app.py` sigue en verde y el tablero expone la evidencia de gobernanza |
-| Postmortem del simulacro completado | El base dejaba `REPLACE` en comunicación y acciones correctivas | `reports/lab13/INCIDENT_POSTMORTEM.md` con responsables y fechas |
+| Postmortem del simulacro completado | El base dejaba la plantilla en blanco en comunicación y acciones correctivas | `reports/lab13/INCIDENT_POSTMORTEM.md` con responsables y fechas |
+| Model Card del Ejercicio 08 redactada y generada | Era la plantilla del proyecto base: siete secciones sin contenido, mientras el PDF afirmaba que estaba completa | `scripts/build_model_card.py` la genera desde `reports/`; el PDF y la tarjeta muestran las mismas cifras |
+| Tablas del PDF rehechas con celdas ajustables | La tabla de la sección 2 del PDF tenía texto solapado e ilegible | Página 2 renderizada a PNG y revisada: sin solapamientos |
+| Tasas de positivos calculadas desde los datos | El README y el PDF traían la tasa de G1 de los datos completos con un decimal de más, y el Dataset Card traía la tasa de G1 de la prueba equivocada | `reports/lab13/dataset_stats.json`: 49,7 % / 63,9 % (datos completos) y 48,5 % / 72,9 % (prueba) |
+| Conteo de celdas interseccionales con soporte insuficiente unificado en tres | README y postmortem decían dos; figura, notebook y PDF, tres | `reports/lab13/dataset_stats.json`: 3 celdas (n=8, n=11 y n=14; umbral 15) |
+| Leyenda de la figura de inventario corregida | Decía «azul = entra al modelo», pero las variables se dibujan en verde azulado | La figura muestra la leyenda «Entra al modelo (variable)» y «Fuera del modelo (no variable)» |
+| Redacción de la decisión alineada (LIMITAR / REVIEW / STOP) | El registro de decisión y el archivo del LAB12 eran copias del Ejercicio 07 y arrastraban etiquetas contradictorias | `reports/lab11/DECISION_RECORD.md` y `student_inputs/lab12_decision.yml` con la misma forma que el Ejercicio 07 |
 
-## Verificaciones que el estudiante debe repetir
+## Verificaciones ejecutadas (Ejercicio 07)
 
-- [ ] `uv sync --frozen` y `uv run pytest -q` → 10 passed.
-- [ ] `uv run python scripts/check_environment.py` → `dataset_status: valid`, 640 filas.
-- [ ] `uv run python scripts/lab11_impact.py` → `reports/lab11/risk_register_scored.csv` con 9 riesgos
+- [x] `uv sync --frozen` y `uv run pytest -q` → `10 passed in 1.52s`.
+- [x] `uv run python scripts/check_environment.py` → `{'python_project': 'ok', 'dataset_status': 'valid',
+      'rows': 640, 'columns': 9}`.
+- [x] `uv run python scripts/lab11_impact.py` → `reports/lab11/risk_register_scored.csv` con 9 riesgos
       y `rmf_summary.json`.
-- [ ] `uv run python scripts/lab12_audit.py --model logistic` y `--model tree` → métricas globales,
-      por grupo e interseccionales.
-- [ ] `uv run python scripts/validate_lab12_decision.py` → `decision_status: documented`.
-- [ ] `uv run pytest -q tests/test_impact.py tests/test_privacy.py tests/test_fairness.py tests/test_model.py`.
-- [ ] Revisar que las cifras del registro de decisión coinciden con los CSV y JSON.
+- [x] `uv run python scripts/lab12_audit.py --model logistic` y `--model tree` → métricas globales,
+      por grupo e interseccionales (`G1 n=101 recall 0.653 · G2 n=59 recall 0.791`; árbol
+      `model_kb 7.9013671875`).
+- [x] `uv run python scripts/validate_lab12_decision.py` → `decision_status: documented`.
+- [x] `uv run pytest -q tests/test_impact.py tests/test_privacy.py tests/test_fairness.py
+      tests/test_model.py` → `5 passed in 0.98s`.
+- [x] Cifras del registro de decisión contrastadas contra los CSV y JSON de `reports/`.
 
 ## Correcciones realizadas
 
@@ -92,10 +124,12 @@ referencia, cifra o evidencia fue inventada: todas provienen de `reports/lab11/`
 |---|---|---|
 | `scripts/lab11_impact.py` no compilaba (`SyntaxError: unterminated string literal`) | El ZIP del profesor trae saltos de línea reales dentro de literales de cadena | El script se ejecuta y genera `reports/lab11/` |
 | `scripts/simulate_incident.py` no compilaba (`SyntaxError: unterminated f-string literal`) | Misma causa en el archivo de texto del simulacro | Se reescribió la construcción del texto con `\n` escapados |
-| El script de LAB11 ya no sobrescribe `DECISION_RECORD.md` si el estudiante ya lo redactó | El base lo regeneraba con el texto `REPLACE` en cada ejecución y borraba el trabajo del estudiante | Al reejecutar el script, el registro se conserva |
+| El script de LAB11 ya no sobrescribe `DECISION_RECORD.md` si el estudiante ya lo redactó | El base lo regeneraba con la plantilla en blanco en cada ejecución y borraba el trabajo del estudiante | Al reejecutar el script, el registro se conserva |
 
 No se modificaron `pyproject.toml` ni `uv.lock` del proyecto base, ni la lógica de `data.py`,
-`impact.py`, `fairness.py`, `model.py` o `governance.py`.
+`impact.py`, `fairness.py`, `model.py`, `pipeline.py` o `governance.py`. Sobre esos archivos del base
+se aplicó únicamente el formateo automático de `ruff` (imports ordenados y saltos de línea), sin
+cambios de comportamiento.
 
 ## Referencias utilizadas (verificables)
 
@@ -110,7 +144,7 @@ No se modificaron `pyproject.toml` ni `uv.lock` del proyecto base, ni la lógica
 
 - Las cifras provienen de ejecuciones en esta máquina y deben reejecutarse en el entorno de entrega.
 - La auditoría usa **una sola partición temporal y una sola semilla**, sin intervalos de confianza: las
-  brechas son(point estimates) y deben leerse con esa incertidumbre.
+  brechas son estimaciones puntuales y deben leerse con esa incertidumbre.
 - El caso es sintético: ninguna conclusión describe poblaciones, zonas o personas reales.
-- La interpretación normativa (qué obligations aplican y quién responde) es del estudiante y debe
+- La interpretación normativa (qué obligaciones aplican y quién responde) es del estudiante y debe
   poder defenderse sin el apoyo de esta herramienta.

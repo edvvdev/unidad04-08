@@ -46,10 +46,10 @@ repositorio.
 
 | Elemento | Dónde está |
 |---|---|
-| Notebook ejecutado | `notebooks/02_ejercicio08_gobernanza_dss.ipynb` (13 celdas, con salidas) |
+| Notebook ejecutado | `notebooks/02_ejercicio08_gobernanza_dss.ipynb` (14 celdas, con salidas) |
 | Artefactos editables | `configs/governance.yml` (inventario, minimización, retención, monitoreo, incidente, apelación), `student_inputs/raci.csv` (12 actividades) |
 | Evidencia | `reports/lab13/deployment_decision.json`, `fairness_by_group.csv`, `INCIDENT_POSTMORTEM.md`, `ejercicio08_resumen.json` |
-| Documentos | `docs/MODEL_CARD.md`, `docs/RUNBOOK.md`, `docs/INVENTARIO_Y_RETENCION.md`, `docs/DATASET_CARD.md` |
+| Documentos | `docs/MODEL_CARD.md` (generada desde `reports/`), `docs/RUNBOOK.md`, `docs/INVENTARIO_Y_RETENCION.md`, `docs/DATASET_CARD.md` |
 | PDF de síntesis | `docs/EJERCICIO_08_PDF_SINTESIS.pdf` (4 páginas) |
 | Pruebas | `uv run pytest -q` → 10 passed (incluye la prueba de la app de Streamlit sin navegador) |
 
